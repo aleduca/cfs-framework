@@ -4,8 +4,10 @@ return
     [
     'GET' =>
     [
-        '/' => 'HomeController@index',
-        '/login' => 'LoginController@index',
+        '/' => ['HomeController@index',['name' => 'home']],
+        '/user/{id}' => ['UserController@index',['name' => 'user']],
+        '/product/{id}/name/{name}' => 'ProductController@index',
+        '/login' => ['LoginController@index'],
     ],
     'POST' => [
         '/login' => 'LoginController@store'

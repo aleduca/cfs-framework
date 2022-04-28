@@ -14,8 +14,8 @@ class Router
             throw new Exception("Route {$this->path} does not exist");
         }
         
-        if (!isset($routes[$this->request][$this->path])) {
-            throw new Exception("Route {$this->path} does not exist");
+        if (isset($routes[$this->request][$this->path])) {
+            return true;
         }
     }
 
@@ -30,15 +30,32 @@ class Router
         }
     }
 
+    private function routerPlaceholder(array $routes)
+    {
+        $this->path = RouterPlaceholder::create($routes[$this->request], $this->path);
+    }
+
     public function execute($routes)
     {
         $this->path = path();
         $this->request = request();
 
-        $this->routeFound($routes);
+        $routerFound = $this->routeFound($routes);
 
-        [$controller, $action] = explode('@', $routes[$this->request][$this->path]);
+        if (!$routerFound) {
+            $this->routerPlaceholder($routes);
+        }
+
+        $router = $routes[$this->request][$this->path];
+
+        if (is_string($router)) {
+            [$controller, $action] = explode('@', $router);
+        }
         
+        if (is_array($router)) {
+            [$controller, $action] = explode('@', $router[0]);
+        }
+    
         $controllerNamespace = "app\\controllers\\{$controller}";
 
         $this->controllerFound($controllerNamespace, $controller, $action);
