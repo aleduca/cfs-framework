@@ -3,7 +3,13 @@ namespace app\framework\classes;
 
 class RouterName
 {
-    public static function create(array $router)
+    protected static string $name;
+
+    public static function set(string $route)
+    {
+    }
+
+    public static function get()
     {
     }
 }

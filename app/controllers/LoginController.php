@@ -3,15 +3,11 @@ namespace app\controllers;
 
 use app\framework\classes\Cache;
 
-class LoginController
+class LoginController extends Controller
 {
     public function index()
     {
-        $data = Cache::get('name', function () {
-            return ['name' => 'Joao'];
-        }, 5);
-
-        view('login', $data);
+        view('login', ['name' => 'Pedro']);
     }
 
     public function store()

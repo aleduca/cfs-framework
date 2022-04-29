@@ -32,7 +32,13 @@ class Router
 
     private function routerPlaceholder(array $routes)
     {
-        $this->path = RouterPlaceholder::create($routes[$this->request], $this->path);
+        $path = RouterPlaceholder::create($routes[$this->request], $this->path);
+
+        if (!$path) {
+            throw new Exception("Route does not exist {$this->path}");
+        }
+
+        $this->path = $path;
     }
 
     public function execute($routes)
@@ -40,8 +46,10 @@ class Router
         $this->path = path();
         $this->request = request();
 
+        // if not found the exact router with path
         $routerFound = $this->routeFound($routes);
 
+        // try to get with dynamic routes
         if (!$routerFound) {
             $this->routerPlaceholder($routes);
         }

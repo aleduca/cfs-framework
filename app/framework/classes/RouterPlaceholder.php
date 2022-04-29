@@ -13,15 +13,18 @@ class RouterPlaceholder
                     return '[a-z0-9]+';
                 }, $routeReplaced);
 
+                
                 preg_match("/$pattern/", $path, $match);
-
+                
                 if (isset($match[0])) {
+                    RouterParameters::set($route, $match[0]);
+                    RouterName::set($match[0]);
                     return $route;
                     break;
                 }
-
-                // return false;
             }
         }
+
+        return false;
     }
 }
