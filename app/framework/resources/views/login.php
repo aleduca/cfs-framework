@@ -9,7 +9,7 @@
     </ul>
 <?php $this->end(); ?>
 
-<form action="/login" method="post">
+<form action="<?php echo $this->router('login.post'); ?>" method="post">
     <input type="text" placeholder="Email">
     <input type="password" placeholder="Senha">
 

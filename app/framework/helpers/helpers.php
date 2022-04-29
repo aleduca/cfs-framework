@@ -3,12 +3,13 @@
 use app\framework\classes\Engine;
 use app\framework\classes\Macros;
 use app\framework\classes\Router;
+use app\framework\classes\RouterName;
 
 // call the Engine to ender page
 function View(string $path, array $data = [])
 {
     $engine = new Engine;
-    $engine->dependencies([new Macros]);
+    $engine->dependencies([new Macros, RouterName::class]);
     echo $engine->render($path, $data);
 }
 

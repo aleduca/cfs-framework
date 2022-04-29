@@ -41,6 +41,11 @@ class Router
         $this->path = $path;
     }
 
+    private function routerName($routes)
+    {
+        RouterName::set($routes);
+    }
+
     public function execute($routes)
     {
         $this->path = path();
@@ -54,8 +59,12 @@ class Router
             $this->routerPlaceholder($routes);
         }
 
-        $router = $routes[$this->request][$this->path];
+        $this->routerName($routes);
 
+        // var_dump($this->router('login'));
+
+        $router = $routes[$this->request][$this->path];
+        
         if (is_string($router)) {
             [$controller, $action] = explode('@', $router);
         }

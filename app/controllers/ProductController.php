@@ -5,7 +5,8 @@ class ProductController extends Controller
 {
     public function index()
     {
-        var_dump($this->parameters()->id); // get parameter based on placeholder name (e.g. /product/name/{id}/name/{name})
+        // var_dump($this->router('login'));
+        // var_dump($this->parameters()->id); // get parameter based on placeholder name (e.g. /product/name/{id}/name/{name})
     }
 
     public function update()

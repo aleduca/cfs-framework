@@ -18,7 +18,6 @@ class RouterPlaceholder
                 
                 if (isset($match[0])) {
                     RouterParameters::set($route, $match[0]);
-                    RouterName::set($match[0]);
                     return $route;
                     break;
                 }
