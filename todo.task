@@ -1,0 +1,17 @@
+Framework:
+    Database:
+        ✔ Cadastrar usando __get e __set @done(22-04-30 17:21)
+            ✔ usar o método save @done(22-04-30 17:21)
+        ✔ Atualizar usando o __get e __set @done(22-04-30 17:21)
+            ✔ usar o método save @done(22-04-30 17:21)
+            ✔ atualizar somente quando passar o id @done(22-04-30 17:21)
+        ✔ Criar método para cadastro @done(22-04-30 17:21)
+        ✔ Criar um método para atualizar @done(22-04-30 17:21)
+        ☐ Criar um método para o delete
+        ☐ Deletar quando passo somente o id.
+            ☐ $user->id e depois $user->delete()
+        ☐ Select para todos os registros
+            ☐ método all
+        ☐ Criar uma query builder para os diferentes tipos de filtros
+    
+    
