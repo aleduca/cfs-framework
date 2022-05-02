@@ -2,6 +2,8 @@
 namespace app\database\models;
 
 use app\database\DatabaseConnect;
+use Exception;
+use PDO;
 
 class Model
 {
@@ -11,6 +13,24 @@ class Model
     {
         try {
             $sql = "select {$fields} from {$this->table}";
+            $connection = DatabaseConnect::getConnection();
+            $prepare = $connection->prepare($sql);
+            $prepare->execute();
+
+            return $prepare->fetchAll(PDO::FETCH_CLASS, get_called_class());
+        } catch (\Throwable $th) {
+        }
+    }
+
+    public function findBy(string $field, string|int $value, string $fields = '*')
+    {
+        try {
+            $sql = "select {$fields} from {$this->table} where {$field} = :{$field}";
+            $connection = DatabaseConnect::getConnection();
+
+            $prepare = $connection->prepare($sql);
+            $prepare->execute([$field => $value]);
+            return $prepare->fetchObject();
         } catch (\Throwable $th) {
         }
     }
@@ -29,48 +49,72 @@ class Model
 
     public function update(array $data)
     {
-        $originalData = $data;
-
-        unset($data['id']);
-
-        $sql = "update {$this->table} set ";
-        foreach (array_keys($data) as $key) {
-            $sql.="{$key} = :{$key},";
-        }
-
-        $sql = rtrim($sql, ',');
-
-        $sql .= " where id = :id";
-
-        $connection = DatabaseConnect::getConnection();
-        $prepare = $connection->prepare($sql);
-        return $prepare->execute($originalData);
-    }
-
-    public function create(array $data)
-    {
-        $sql = "insert into {$this->table}(";
-        $sql.=implode(',', array_keys($data)).') values(';
-        $sql.=':'.implode(',:', array_keys($data)).')';
-
-        $connection = DatabaseConnect::getConnection();
-        $prepare = $connection->prepare($sql);
-        return $prepare->execute($data);
-    }
-
-    public function save()
-    {
         try {
-            if (isset($this->attributes['id'])) {
-                return $this->update($this->attributes);
+            $originalData = $data;
+
+            unset($data['id']);
+
+            $sql = "update {$this->table} set ";
+            foreach (array_keys($data) as $key) {
+                $sql.="{$key} = :{$key},";
             }
-            return $this->create($this->attributes);
+
+            $sql = rtrim($sql, ',');
+
+            $sql .= " where id = :id";
+
+            $connection = DatabaseConnect::getConnection();
+            $prepare = $connection->prepare($sql);
+            return $prepare->execute($originalData);
         } catch (\Throwable $th) {
             DatabaseConnect::rollback($th);
         }
     }
 
-    public function delete()
+    public function create(array $data)
     {
+        try {
+            $sql = "insert into {$this->table}(";
+            $sql.=implode(',', array_keys($data)).') values(';
+            $sql.=':'.implode(',:', array_keys($data)).')';
+        
+            $connection = DatabaseConnect::getConnection();
+            $prepare = $connection->prepare($sql);
+            return $prepare->execute($data);
+        } catch (\Throwable $th) {
+            DatabaseConnect::rollback($th);
+        }
+    }
+
+    public function save()
+    {
+        try {
+            return isset($this->attributes['id']) ?
+                $this->update($this->attributes):
+                $this->create($this->attributes);
+        } catch (\Throwable $th) {
+            DatabaseConnect::rollback($th);
+        }
+    }
+    
+    public function delete(array $data = [])
+    {
+        try {
+            if (isset($this->attributes['id'])) {
+                $sql = "delete from {$this->table} where id = :id";
+                $data = ['id' => $this->attributes['id']];
+            } else {
+                if (!isset($data['field'], $data['value'])) {
+                    throw new Exception("To delete please give the field and value index to array");
+                }
+                $sql = "delete from {$this->table} where {$data['field']} = :{$data['field']}";
+                $data = [$data['field'] => $data['value']];
+            }
+            $connection = DatabaseConnect::getConnection();
+            $prepare = $connection->prepare($sql);
+            return $prepare->execute($data);
+        } catch (\Throwable $th) {
+            DatabaseConnect::rollback($th);
+        }
     }
 }

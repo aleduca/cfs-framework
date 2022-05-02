@@ -8,17 +8,14 @@ class HomeController
 {
     public function index()
     {
-        // DatabaseConnect::open(true);
+        DatabaseConnect::open(true);
 
-        // $user = new User;
-        // $user->create([
-        //     'firstName' => 'Joao',
-        //     'lastName' => 'Santos',
-        //     'email' => 'santos@email.com.br',
-        //     'password' => password_hash('123', PASSWORD_DEFAULT),
-        // ]);
+        $user = new User;
+        $userFound = $user->findBy('id', 267);
+
+        var_dump($userFound);
         
-        // DatabaseConnect::close();
+        DatabaseConnect::close();
         view('home', ['name' => 'Alexandre']);
     }
 }

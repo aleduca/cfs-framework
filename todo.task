@@ -7,11 +7,13 @@ Framework:
             ✔ atualizar somente quando passar o id @done(22-04-30 17:21)
         ✔ Criar método para cadastro @done(22-04-30 17:21)
         ✔ Criar um método para atualizar @done(22-04-30 17:21)
-        ☐ Criar um método para o delete
-        ☐ Deletar quando passo somente o id.
-            ☐ $user->id e depois $user->delete()
-        ☐ Select para todos os registros
-            ☐ método all
-        ☐ Criar uma query builder para os diferentes tipos de filtros
+        ✔ Criar um método para o delete @done(22-05-02 13:50)
+        ✔ Deletar quando passo somente o id. @started(22-05-02 13:50) @done(22-05-02 13:50) @lasted(25s)
+            ✔ $user->id e depois $user->delete() @done(22-05-02 13:50)
+        ✔ Select para todos os registros @done(22-05-02 13:59)
+            ✔ método all @done(22-05-02 13:59)
+        ✔ Select para pegar um registro em específico(talvez um findBy) @done(22-05-02 14:31)
+        ☐ Criar uma query builder para os diferentes tipos de filtros(selects)
+        
     
     
