@@ -1,6 +1,7 @@
 <?php
 namespace app\controllers;
 
+use app\database\builder\DB;
 use app\database\DatabaseConnect;
 use app\database\models\User;
 
@@ -10,11 +11,11 @@ class HomeController
     {
         DatabaseConnect::open(true);
 
-        $user = new User;
-        $userFound = $user->findBy('id', 267);
-
-        var_dump($userFound);
+        $db = new DB;
+        $userFound = $db->table('users')->select('id, firstName, lastName')->get();
         
+        var_dump($userFound);
+
         DatabaseConnect::close();
         view('home', ['name' => 'Alexandre']);
     }

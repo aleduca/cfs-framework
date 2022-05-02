@@ -23,6 +23,7 @@
     },
     "require": {
         "symfony/var-dumper": "^6.0",
-        "vlucas/phpdotenv": "^5.4"
+        "vlucas/phpdotenv": "^5.4",
+        "doctrine/inflector": "^2.0"
     }
 }

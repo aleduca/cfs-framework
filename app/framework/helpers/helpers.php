@@ -4,6 +4,7 @@ use app\framework\classes\Engine;
 use app\framework\classes\Macros;
 use app\framework\classes\Router;
 use app\framework\classes\RouterName;
+use Doctrine\Inflector\InflectorFactory;
 
 // call the Engine to ender page
 function View(string $path, array $data = [])
@@ -45,4 +46,10 @@ function path($index = 'path')
 function request()
 {
     return $_SERVER['REQUEST_METHOD'];
+}
+
+function singularizeModel($model)
+{
+    $inflector = InflectorFactory::create()->build();
+    $modelWithNamespace = "app\\database\\models\\{$inflector->singularize(ucfirst($model))}";
 }
