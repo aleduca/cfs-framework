@@ -12,17 +12,32 @@ class DB
     private string $where;
     private string $whereIn;
     private string $order;
+    private string $group;
     private array $binds = [];
     private string $and;
+    private string $join;
     private string $or;
     private string $limit;
+    private string $offset;
 
-    private function clearPropertyQuery(string $property):void
+    private function clearPropertyQuery(string|array $property):void
     {
-        if (property_exists($this, $property)) {
-            unset($this->$property);
-        } else {
-            var_dump("property {$property} does not exist");
+        if (is_string($property)) {
+            if (property_exists($this, $property)) {
+                unset($this->$property);
+            } else {
+                var_dump("property {$property} does not exist");
+            }
+        }
+        
+        if (is_array($property)) {
+            foreach ($property as $prop) {
+                if (property_exists($this, $prop)) {
+                    unset($this->$prop);
+                } else {
+                    var_dump("property {$prop} does not exist");
+                }
+            }
         }
     }
 
@@ -43,19 +58,20 @@ class DB
 
     public function where(string $field, string $operator, string|int $value):self
     {
+        $replaceField = str_replace('.', '', $field);
         if (!isset($this->where)) {
-            $this->where = " where {$field} {$operator} :{$field}";
-            $this->binds[$field] = $value;
+            $this->where = " where {$field} {$operator} :{$replaceField}";
+            $this->binds[$replaceField] = $value;
         }
         
         if (isset($this->and) && isset($this->where)) {
-            $this->where .= " {$this->and} {$field} {$operator} :{$field}";
-            $this->binds[$field] = $value;
+            $this->where .= " {$this->and} {$field} {$operator} :{$replaceField}";
+            $this->binds[$replaceField] = $value;
         }
         
         if (isset($this->or) && isset($this->where)) {
-            $this->where .= " {$this->or} {$field} {$operator} :{$field}";
-            $this->binds[$field] = $value;
+            $this->where .= " {$this->or} {$field} {$operator} :{$replaceField}";
+            $this->binds[$replaceField] = $value;
         }
 
         $this->clearPropertyQuery('and');
@@ -64,7 +80,7 @@ class DB
         return $this;
     }
 
-    public function whereIn(string|int $field, array $data):self
+    public function whereIn(string $field, array $data):self
     {
         $whereInConverted = "{$field} IN "."('".implode("','", $data)."')";
 
@@ -93,6 +109,23 @@ class DB
         return $this;
     }
 
+    public function group(string $group):self
+    {
+        $this->group = " group by {$group}";
+        return $this;
+    }
+
+    public function join(string $table, string $query, $type = 'inner'):self
+    {
+        if (!isset($this->join)) {
+            $this->join = " {$type} join {$table} on {$query}";
+        } else {
+            $this->join.= " {$type} join {$table} on {$query}";
+        }
+        
+        return $this;
+    }
+
     public function and():self
     {
         $this->and = ' and';
@@ -112,7 +145,44 @@ class DB
         return $this;
     }
 
-    public function get():self
+    public function offset(int $offset):self
+    {
+        if (!isset($this->limit)) {
+            throw new Exception("Offset need a limit");
+        }
+        $this->offset = " offset {$offset}";
+        return $this;
+    }
+
+    public function count()
+    {
+        $connection = DatabaseConnect::getConnection();
+        
+        $query = $this->dump();
+
+        $prepare = $connection->prepare($query);
+        
+        $prepare->execute($this->binds);
+        
+        $this->clearPropertyQuery('binds');
+
+        return $prepare->rowCount();
+    }
+
+    public function total():int
+    {
+        $connection = DatabaseConnect::getConnection();
+
+        $query = $connection->query($this->select);
+
+        return $query->rowCount();
+    }
+
+    public function paginate()
+    {
+    }
+
+    public function get()
     {
         try {
             $connection = DatabaseConnect::getConnection();
@@ -132,7 +202,7 @@ class DB
         }
     }
     
-    public function first():self
+    public function first()
     {
         try {
             $connection = DatabaseConnect::getConnection();
@@ -154,15 +224,22 @@ class DB
     public function dump():string
     {
         $filters = $this->select ?? throw new Exception("Select method is required");
+        $filters .= $this->join ?? '';
         $filters .= $this->where ?? '';
         $filters .= $this->whereIn ?? '';
+        $filters .= $this->group ?? '';
         $filters .= $this->order ?? '';
         $filters .= $this->limit ?? '';
+        $filters .= $this->offset ?? '';
 
-        $this->clearPropertyQuery('where');
-        $this->clearPropertyQuery('whereIn');
-        $this->clearPropertyQuery('order');
-        $this->clearPropertyQuery('limit');
+        // You can clear properties with one array or call the clearProperty method to clear one by one.
+        $this->clearPropertyQuery(['where','whereIn','order','group','limit','join','offset']);
+        // $this->clearPropertyQuery('whereIn');
+        // $this->clearPropertyQuery('order');
+        // $this->clearPropertyQuery('limit');
+        // $this->clearPropertyQuery('group');
+        // $this->clearPropertyQuery('join');
+        // $this->clearPropertyQuery('offset');
 
         return $filters;
     }
