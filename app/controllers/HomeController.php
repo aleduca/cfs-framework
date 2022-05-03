@@ -12,9 +12,18 @@ class HomeController
         DatabaseConnect::open(true);
 
         $db = new DB;
-        $userFound = $db->table('users')->select('id, firstName, lastName')->get();
+        $usersFound = $db->table('users')
+        ->select('id, firstName, lastName')
+        ->where('id', '>', 260)
+        ->order('id desc')
+        ->limit(2)
+        ->get();
+
+        var_dump($usersFound);
         
-        var_dump($userFound);
+        // $commentsFound = $db->table('comments')->select('id,content')->where('id', '>', 1)->get();
+        
+        // dd($commentsFound);
 
         DatabaseConnect::close();
         view('home', ['name' => 'Alexandre']);
